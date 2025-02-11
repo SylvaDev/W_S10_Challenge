@@ -13,6 +13,7 @@ const initialFormState = { // suggested
 
 export default function PizzaForm() {
   const [formState, setFormState] = useState(initialFormState);
+  const [errorMessage, setErrorMessage] = useState('');
   const [createOrder, { isLoading, isError }] = useCreateOrderMutation();
 
   const handleChange = (e) => {
@@ -25,11 +26,31 @@ export default function PizzaForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    let error = '';
+
+    // Validate form fields
+    if (!formState.fullName) {
+      error = 'Order failed: fullName is required';
+    } else if (!formState.size) {
+      error = 'Order failed: size must be one of the following values: S, M, L';
+    }
+
+    setErrorMessage(error); // Set error message regardless of submission
+
     try {
-      await createOrder(formState).unwrap();
+      // Set loading state to true when submitting
+      setErrorMessage(''); // Clear previous error message
+
+      // Include toppings in the order data
+      const orderData = {
+        ...formState,
+        toppings: Object.keys(formState).filter(key => formState[key] === true) // Collect selected toppings
+      };
+      await createOrder(orderData).unwrap();
       setFormState(initialFormState);
     } catch (error) {
       console.error('Failed to create order: ', error);
+      setErrorMessage(error.data?.message || 'Failed to create order. Please try again.'); // Use API error message if available
     }
   };
 
@@ -37,7 +58,8 @@ export default function PizzaForm() {
     <form onSubmit={handleSubmit}>
       <h2>Pizza Form</h2>
       {isLoading && <div className='pending'>Order in progress...</div>}
-      {isError && <div className='failure'>Order failed: fullName is required</div>}
+      {errorMessage && <div className='failure'>Order Failed: {errorMessage}</div>}
+      {/* {isError && <div className='failure'>An error occurred while creating the order.</div>} */}
 
       <div className="input-group">
         <div>

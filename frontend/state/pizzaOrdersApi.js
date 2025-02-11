@@ -3,6 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 export const pizzaOrdersApi = createApi({
     reducerPath: 'pizzaOrdersApi',
     baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:9009/api/pizza/' }),
+    tagTypes: ['Orders'],
     endpoints: build => ({
         getOrders: build.query({
             query: () => 'history',
