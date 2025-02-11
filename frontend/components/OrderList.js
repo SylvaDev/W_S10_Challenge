@@ -1,17 +1,20 @@
 import React from 'react'
+import { useGetOrdersQuery, useCreateOrderMutation } from '../state/pizzaOrdersApi'
 
 export default function OrderList() {
-  const orders = []
+  //rtk query
+  const { data: orders } = useGetOrdersQuery()
+
   return (
     <div id="orderList">
       <h2>Pizza Orders</h2>
       <ol>
         {
-          orders.map(() => {
+          orders?.map((order) => {
             return (
-              <li key={1}>
+              <li key={order.id}>
                 <div>
-                  order details here
+                {`${order.customer} ordered a size ${order.size} with ${order.toppings && order.toppings.length > 0 ? `${order.toppings.length} topping${order.toppings.length > 1 ? 's' : ''}` : 'no toppings'}`}
                 </div>
               </li>
             )
